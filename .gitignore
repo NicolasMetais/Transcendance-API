@@ -1,0 +1,3 @@
+api/dist
+api/.env
+api/pong.db
