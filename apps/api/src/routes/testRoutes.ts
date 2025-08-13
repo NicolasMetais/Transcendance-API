@@ -7,7 +7,7 @@ export default async function (fastify: FastifyInstance, opts: { db:any }) {
 		return users;
 	});
 	fastify.get('/showStats', async () => {
-		const users = await db.all('SELECT * FROM stats'); 
+		const users = await db.all('SELECT * FROM stats');
 		return users;
 	});
 		fastify.get('/showFriends', async () => {

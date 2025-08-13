@@ -18,6 +18,7 @@
         "bcrypt": "6.0.0",
         "@types/bcrypt": "6.0.0",
         "nodemailer": "7.0.5",
-        "@types/nodemailer": "6.4.17"
+        "@types/nodemailer": "6.4.17",
+        "jwks-rsa": "3.2.0"
     }
 }

@@ -8,6 +8,8 @@ import defaultRoute from "./routes/testRoutes.js"
 import userRoutes from "./routes/usersRoutes.js";
 import matchesRoutes from "./routes/matchesRoutes.js";
 import friendsRoutes from "./routes/friendsRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+
 import { signToken, verifyToken } from './jwt.js';
 
 //manipulation de fichiers
@@ -66,7 +68,7 @@ await app.register(cors, {
 const db = await bdd();
 
 //routes non protegee par un JWT
-const openPaths = ['/signUp', '/signIn']
+const openPaths = ['/signUp', '/signIn', '/auth/google/callback', '/2fa_req']
 app.addHook('preHandler', (request: any, reply: any, done: any) => {
   if (openPaths.includes(request.routerPath)) {
     done();
@@ -105,6 +107,8 @@ app.register(defaultRoute, { db });
 app.register(userRoutes, { db });
 app.register(matchesRoutes, { db });
 app.register(friendsRoutes, { db });
+app.register(authRoutes, { db });
+
 
 const PORT = 8443;
 try {

@@ -129,12 +129,6 @@ docker-compose -f docker/compose.yml logs api
 docker-compose -f docker/compose.yml logs web
 ```
 
-## 📡 API Endpoints
-
-### Health Check
-- `GET https://localhost:8443/health`
-- Returns: `{ ok: true }`
-
 ## 🎨 Frontend
 
 - **URL**: `http://localhost:5173`
@@ -228,5 +222,106 @@ make dev
 The project works with Node.js v20+. For older versions, consider upgrading.
 
 ## 📄 License
+
+## 📡 API DOC
+
+# 📡 API Documentation
+
+## 📝 Description
+L'API est un serveur qui communique **uniquement** avec `http://localhost:5173`.  
+Elle permet d’effectuer des requêtes sur la base de données en toute sécurité, en servant d’intermédiaire entre le **frontend** et la **base de données**.  
+
+- Les échanges se font **au format JSON**.  
+- Les requêtes **doivent** envoyer du JSON dans leur corps.  
+- Les réponses seront toujours en JSON.  
+
+## 🔑 Authentification
+Pour effectuer la majorité des requêtes, **un token JWT** est nécessaire.  
+Ce token valide que vous êtes un utilisateur authentifié.  
+
+### Format du header :
+Authorization: Bearer <votre_token>
+
+## 🚪 Routes **sans authentification**
+Ces routes ne nécessitent **pas** de token.
+
+`GET /auth/google/callback`
+- **Description** : OAuth Google.  
+- **Processus** :  
+  1. Redirigez l’utilisateur vers la page OAuth fournie par Google.  
+  2. Google vous renvoie un **code**.  
+  3. Envoyez ce code à cette route pour obtenir un **token JWT**.  
+- **Réponse** : `{ token: "<jwt>" }`
+
+`POST /auth/google/SignIn`
+- **Description** : Connexion par email + mot de passe.  
+- **Body attendu** :
+```json
+{
+  "email": "string",
+  "password": "string"
+}
+
+
+il faut un id et un code de 6 chiffre dans le body pour valider la connection a deux facteurs
+https://localhost:8443/2fa_req
+
+------------ Toutes les autres routes necessite un token d'authentification ---------------
+Chaques requetes a besoin d'un token dans sont header dans le format: Authorization: Bearer token
+
+C'est des routes de test a ne pas utiliser sur le front ca sera supprimer ca sert juste a print les donnee de la base pour test, il suffit de les appeler sans rien envoyer et tu recois toute la table en JSON
+https://localhost:8443/showUsers
+https://localhost:8443/showStats
+https://localhost:8443/showFriends
+https://localhost:8443/showMatches
+
+il faut deux user_id valide dans le body de la requete pour incrementer les statistiques des deux players de 1
+https://localhost:8443/incrementGameplayed
+
+Il faut un user_id et un friend_id  dans le body pour faire une requete et creer une demande d'amis
+https://localhost:8443/friendRequest
+
+
+Il suffit d'envoyer l'id du user dans le path pour recuperer tout les amis du user
+https://localhost:8443/friendlist/:id
+
+Un id dans la path pour recuperer toute les demandes d'amis en attente du user
+https://localhost:8443/friendReq/:id
+
+deux user id dans le body pour accepter la demande d'amis
+https://localhost:8443/friendAccept
+
+deux user id dans le body pour refuser la demande d'amis
+https://localhost:8443/friendRefuse
+
+deux user id dans le body pour blocker les amis
+https://localhost:8443/friendBlock
+
+deux user id dans le body pour deblocker les amis
+https://localhost:8443/unblockFriend
+
+deux user id dans le body pour supprimer un amis
+https://localhost:8443/unblockFriend
+
+Rajouter un match finis a l'historique dans le body: id1, id2, winner_id, scoreP1, scoreP2
+https://localhost:8443/newMatch
+
+il faut un id dans la path pour avoir toutes les donnee d'un match
+https://localhost:8443/matches/:id
+
+il faut un id dans la path pour recuperer toutes les donnee d'un profil de user
+https://localhost:8443/users/:id
+
+il faut un id dans le body pour recuperer les donnee du user connecter
+https://localhost:8443/myprofile
+
+Il faut un id dans la path et une ou plusieurs donnee de la table user pour update la donnee d'un user
+https://localhost:8443/users/:id
+
+il faut un id dans le body pour rendre anonyme le user (modif le username et l'email)
+https://localhost:8443/anonymise
+
+il faut un id dans la path pour delete un user
+https://localhost:8443/users/:id
 
 ISC # Transcendance-API
