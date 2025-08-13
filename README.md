@@ -261,67 +261,153 @@ Ces routes ne nécessitent **pas** de token.
   "email": "string",
   "password": "string"
 }
+```
 
+`POST /auth/google/2fa_req`  
+- **Description** : Validation de la connexion à deux facteurs.  
+- **Body attendu** : 
+```json 
+{
+  "id": "string",
+  "code": "string" // 6 chiffres
+}  
+```
+- **URL de requête** : https://localhost:8443/2fa_req  
 
-il faut un id et un code de 6 chiffre dans le body pour valider la connection a deux facteurs
-https://localhost:8443/2fa_req
+---
 
------------- Toutes les autres routes necessite un token d'authentification ---------------
-Chaques requetes a besoin d'un token dans sont header dans le format: Authorization: Bearer token
+## 🔑 Routes **avec authentification**  
+Toutes les autres routes nécessitent un token d'authentification.  
+Chaque requête doit contenir un token dans son header au format :  
+Authorization: Bearer <token>
 
-C'est des routes de test a ne pas utiliser sur le front ca sera supprimer ca sert juste a print les donnee de la base pour test, il suffit de les appeler sans rien envoyer et tu recois toute la table en JSON
-https://localhost:8443/showUsers
-https://localhost:8443/showStats
-https://localhost:8443/showFriends
-https://localhost:8443/showMatches
+---
 
-il faut deux user_id valide dans le body de la requete pour incrementer les statistiques des deux players de 1
-https://localhost:8443/incrementGameplayed
+### **Routes de test (à supprimer, uniquement pour debug)**  
+Ces routes permettent de visualiser les données de la base en JSON.  
+- GET https://localhost:8443/showUsers  
+- GET https://localhost:8443/showStats  
+- GET https://localhost:8443/showFriends  
+- GET https://localhost:8443/showMatches
 
-Il faut un user_id et un friend_id  dans le body pour faire une requete et creer une demande d'amis
-https://localhost:8443/friendRequest
+---
 
+### **Incrémentation des statistiques**  
+POST https://localhost:8443/incrementGameplayed  
+- **Body attendu** :  
+```json
+{
+  "user_id_1": "string",
+  "user_id_2": "string"
+}
+```
+---
 
-Il suffit d'envoyer l'id du user dans le path pour recuperer tout les amis du user
-https://localhost:8443/friendlist/:id
+### **Gestion des amis**  
 
-Un id dans la path pour recuperer toute les demandes d'amis en attente du user
-https://localhost:8443/friendReq/:id
+#### Créer une demande d’ami  
+POST https://localhost:8443/friendRequest 
+```json
+{
+  "user_id": "string",
+  "friend_id": "string"
+}
+```
 
-deux user id dans le body pour accepter la demande d'amis
-https://localhost:8443/friendAccept
+#### Liste d'amis  
+GET https://localhost:8443/friendlist/:id
 
-deux user id dans le body pour refuser la demande d'amis
-https://localhost:8443/friendRefuse
+#### Demandes d’amis en attente  
+GET https://localhost:8443/friendReq/:id
 
-deux user id dans le body pour blocker les amis
-https://localhost:8443/friendBlock
+#### Accepter une demande  
+POST https://localhost:8443/friendAccept  
+```json
+{
+  "user_id": "string",
+  "friend_id": "string"
+}
+```
+#### Refuser une demande  
+POST https://localhost:8443/friendRefuse  
+```json
+{
+  "user_id": "string",
+  "friend_id": "string"
+}
+```
+#### Bloquer un ami
+POST https://localhost:8443/friendBlock
+```json
+{
+  "user_id": "string",
+  "friend_id": "string"
+}
+```
+#### Débloquer un ami  
+POST https://localhost:8443/unblockFriend  
+```json
+{
+  "user_id": "string",
+  "friend_id": "string"
+}
+```
+#### Supprimer un ami  
+POST https://localhost:8443/unblockFriend  
+```json
+{
+  "user_id": "string",
+  "friend_id": "string"
+}
+```
+---
 
-deux user id dans le body pour deblocker les amis
-https://localhost:8443/unblockFriend
+### **Gestion des matchs**  
 
-deux user id dans le body pour supprimer un amis
-https://localhost:8443/unblockFriend
+#### Ajouter un match fini  
+POST https://localhost:8443/newMatch  
+```json
+{
+  "id1": "string",
+  "id2": "string",
+  "winner_id": "string",
+  "scoreP1": "number",
+  "scoreP2": "number"
+}
+```
+#### Récupérer les données d’un match  
+GET https://localhost:8443/matches/:id
 
-Rajouter un match finis a l'historique dans le body: id1, id2, winner_id, scoreP1, scoreP2
-https://localhost:8443/newMatch
+---
 
-il faut un id dans la path pour avoir toutes les donnee d'un match
-https://localhost:8443/matches/:id
+### **Gestion des profils**  
 
-il faut un id dans la path pour recuperer toutes les donnee d'un profil de user
-https://localhost:8443/users/:id
+#### Récupérer le profil d’un utilisateur  
+GET https://localhost:8443/users/:id
 
-il faut un id dans le body pour recuperer les donnee du user connecter
-https://localhost:8443/myprofile
+#### Récupérer le profil de l’utilisateur connecté  
+POST https://localhost:8443/myprofile  
+```json
+{
+  "id": "string"
+}
+```
+#### Mettre à jour un utilisateur  
+PUT https://localhost:8443/users/:id  
+- **Body attendu** : une ou plusieurs données de la table user.
 
-Il faut un id dans la path et une ou plusieurs donnee de la table user pour update la donnee d'un user
-https://localhost:8443/users/:id
+#### Rendre un utilisateur anonyme  
+POST https://localhost:8443/anonymise  
+```json
+{
+  "id": "string"
+}
+```
+#### Supprimer un utilisateur  
+DELETE https://localhost:8443/users/:id
 
-il faut un id dans le body pour rendre anonyme le user (modif le username et l'email)
-https://localhost:8443/anonymise
+---
 
-il faut un id dans la path pour delete un user
-https://localhost:8443/users/:id
+📄 **ISC # Transcendance-API**
 
 ISC # Transcendance-API
