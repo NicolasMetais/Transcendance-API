@@ -2,9 +2,7 @@ export const userProperties = {
 	id: { type: 'number' },
 		username: { type: 'string' },
 		email: { type: 'string' },
-		password_hash: { type: 'string' },
 		is_2fa: { type: 'number'},
-		secret_2fa: { type: ['string', 'null'] },
 		avatar_url: {type: 'string' },
 		isLogged: { type: 'string' },
 };

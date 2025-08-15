@@ -16,7 +16,6 @@ export const googleOAuth = async (db: Database, code: string) => {
 	params.append('client_secret', client_secret);
 	params.append('redirect_uri', client_url);
 	params.append('grant_type', 'authorization_code');
-
 	const response = await fetch('https://oauth2.googleapis.com/token', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

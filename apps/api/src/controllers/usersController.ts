@@ -98,7 +98,7 @@ export const signIn = async (db: Database, email: string, password: string) => {
 		const secret_2fa = Math.floor(100000 + Math.random() * 900000).toString();
 		const hash = await bcrypt.hash(secret_2fa, saltRounds);
 		await db.run(`UPDATE users SET secret_2fa = ?, timer_2fa = datetime('now', '+5 minutes') WHERE id = ?`, [hash, user.id])
-		await sendEmail ('psychoaoc@gmail.com', "Authentification code", `here is your code: ${secret_2fa}`);
+		await sendEmail (user.email, "Authentification code", `here is your code: ${secret_2fa}`);
 		return { require2FA: true, userId: user.id };
 	}
 	const token = signToken({ userId: user.id });

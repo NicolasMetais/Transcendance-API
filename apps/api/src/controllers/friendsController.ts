@@ -1,4 +1,4 @@
-import { Database } from 'sqlite'
+import { Database } from 'sqlite';
 
 export const createFriend = async (db: Database, user_id: number, friend_id: number , status: string):
 	Promise<any | { error: string }> => {
