@@ -37,8 +37,7 @@ export const getPersonnalData = async (db: Database, id: number) => {
 };
 
 export const getUser = async (db: Database, id: number) => {
-	const user = await db.get('SELECT id, username FROM users WHERE id = ?', [id]);
-	return { user };
+	return await db.get('SELECT id, username FROM users WHERE id = ?', [id]);
 };
 
 export const anonymiseUser = async (db: Database, id: number) => {
@@ -73,13 +72,13 @@ export const updateUser = async (db: Database, id: number, updates: UserUpdateFi
 
 export const deleteUser = async (db: Database, id: number) => {
 	const user = await getUser(db, id);
-	if (!user)
+	if (!user || user.id == 1)
 		return null;
 	await db.run(`UPDATE matches SET player1_id = 1 WHERE player1_id = ?`, [id]);
 	await db.run(`UPDATE matches SET player2_id = 1 WHERE player2_id = ?`, [id]);
 	await db.run(`UPDATE matches SET winner_id = 1 WHERE winner_id = ?`, [id]);
 	await db.run('DELETE FROM friends WHERE user_id = ? OR friend_id = ?', [id, id]);
-	await db.run('DELETE FROM stats WHERE id = ?', [id]);
+	await db.run('DELETE FROM stats WHERE user_id = ?', [id]);
 	await db.run('DELETE FROM users WHERE id = ?', [id]);
 	return user;
 };
@@ -122,5 +121,7 @@ export const req_2fa = async (db: Database, id: number, secret_2fa: string) => {
 	return { token }
 };
 
-
+export const updateUserStatus = async (db: Database, id:number, status: boolean) => {
+	await db.run(`UPDATE users SET isLogged = ? WHERE id = ?`, status, id);
+};
 

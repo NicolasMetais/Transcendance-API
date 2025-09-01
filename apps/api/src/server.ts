@@ -9,8 +9,9 @@ import userRoutes from "./routes/usersRoutes.js";
 import matchesRoutes from "./routes/matchesRoutes.js";
 import friendsRoutes from "./routes/friendsRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import websocketsRoutes from './routes/websocketsRoutes.js';
 
-import { signToken, verifyToken } from './jwt.js';
+import { verifyToken } from './jwt.js';
 
 //manipulation de fichiers
 import fs from "fs";
@@ -18,6 +19,7 @@ import fs from "fs";
 import path from "path";
 import {fileURLToPath } from "url";
 import fastifyStatic from '@fastify/static'
+import fastifyWebsocket from '@fastify/websocket';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -64,11 +66,13 @@ await app.register(cors, {
 	credentials: true
 });
 
+await app.register(fastifyWebsocket);
 
 const db = await bdd();
 
 //routes non protegee par un JWT
-const openPaths = ['/signUp', '/signIn', '/auth/google/callback', '/2fa_req']
+const openPaths = ['/signUp', '/signIn', '/auth/google/callback', '/2fa_req', '/connexionStatus', '/showUsers', '/showStats', '/showFriends', '/showMatches']
+
 app.addHook('preHandler', (request: any, reply: any, done: any) => {
   if (openPaths.includes(request.routerPath)) {
     done();
@@ -108,6 +112,8 @@ app.register(userRoutes, { db });
 app.register(matchesRoutes, { db });
 app.register(friendsRoutes, { db });
 app.register(authRoutes, { db });
+app.register(websocketsRoutes, { db });
+
 
 
 const PORT = 8443;

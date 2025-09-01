@@ -256,7 +256,7 @@ const friendsRoutes = async (fastify, opts) => {
     });
     fastify.route({
         method: 'DELETE',
-        url: "/UnblockFriend",
+        url: "/unblockFriend",
         schema: {
             body: {
                 type: 'object',

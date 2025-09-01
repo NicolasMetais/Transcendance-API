@@ -1,5 +1,6 @@
 import { createUser, getUser, updateUser, deleteUser, signIn, req_2fa, getProfile, getPersonnalData, anonymiseUser } from '../controllers/usersController.js';
 import { userResponseSchema, ProfileResponseSchema } from '../schemas/schema.js';
+import { verifyToken } from '../jwt.js';
 const userRoutes = async (fastify, opts) => {
     const { db } = opts;
     fastify.route({
@@ -66,9 +67,16 @@ const userRoutes = async (fastify, opts) => {
                 200: {
                     type: 'object',
                     properties: {
-                        token: { type: 'string' }
+                        token: { type: 'string' },
+                        require2FA: { type: 'string' },
+                        userId: { type: 'integer' }
                     },
-                    required: ['token']
+                },
+                401: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' }
+                    },
                 }
             },
         },
@@ -161,7 +169,14 @@ const userRoutes = async (fastify, opts) => {
         handler: async (request, reply) => {
             const { id } = request.body;
             try {
-                const data = await getPersonnalData(db, id);
+                const token = request.cookie.jwt;
+                const payload = verifyToken(token);
+                if (!payload) {
+                    reply.code(401).send({ error: "Unauthorized" });
+                    return;
+                }
+                const userId = payload.userId;
+                const data = await getPersonnalData(db, userId);
                 if (!data.user) {
                     reply.code(404).send({ error: "User not found" });
                     return;

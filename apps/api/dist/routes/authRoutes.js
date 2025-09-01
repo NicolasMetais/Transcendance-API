@@ -9,11 +9,11 @@ const authRoutes = async (fastify, opts) => {
                 type: 'object',
                 required: ['code'],
                 properties: {
-                    id: { type: 'string' }
+                    code: { type: 'string' }
                 }
             },
             response: {
-                201: { type: 'null' },
+                201: { type: 'string' },
             },
         },
         handler: async (request, reply) => {

@@ -2,6 +2,7 @@ import { FastifyPluginAsync, FastifyInstance } from 'fastify';
 import { Database } from 'sqlite';
 import { createUser, getUser, updateUser, deleteUser, signIn, req_2fa, getProfile, getPersonnalData, anonymiseUser } from '../controllers/usersController.js'
 import { userResponseSchema, ProfileResponseSchema } from '../schemas/schema.js';
+import { verifyToken } from '../jwt.js';
 
 const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: FastifyInstance, opts: any) => {
 	const { db } = opts;
@@ -83,9 +84,16 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 				200: {
 					type: 'object',
 					properties: {
-						token: { type: 'string'}
+						token: { type: 'string'},
+						require2FA: {type: 'string'},
+						userId: {type: 'integer'}
 					},
-					required: ['token']
+				},
+				401: {
+					type: 'object',
+					properties: {
+						error: { type: 'string'}
+					},
 				}
 			},
 		},
@@ -181,7 +189,15 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 		handler: async(request: any, reply: any) => {
 		 const { id } = request.body as { id: number };
 			try {
-				const data = await getPersonnalData(db, id);
+				const token = request.cookie.jwt;
+				const payload = verifyToken(token);
+				if (!payload)
+				{
+					reply.code(401).send({ error: "Unauthorized"});
+					return ;
+				}
+				const userId = (payload as any).userId;
+				const data = await getPersonnalData(db, userId);
 				if (!data.user)
 				{
 					reply.code(404).send({ error: "User not found"});

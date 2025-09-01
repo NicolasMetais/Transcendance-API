@@ -1,4 +1,4 @@
-import jwt, { JwtPayload, SigningKeyCallback } from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 
 const client = jwksClient({

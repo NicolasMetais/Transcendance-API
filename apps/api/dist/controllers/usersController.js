@@ -30,8 +30,7 @@ export const getPersonnalData = async (db, id) => {
     return { user, friends, matches, stats };
 };
 export const getUser = async (db, id) => {
-    const user = await db.get('SELECT id, username FROM users WHERE id = ?', [id]);
-    return { user };
+    return await db.get('SELECT id, username FROM users WHERE id = ?', [id]);
 };
 export const anonymiseUser = async (db, id) => {
     const { user } = await getUser(db, id);
@@ -54,13 +53,13 @@ export const updateUser = async (db, id, updates) => {
 };
 export const deleteUser = async (db, id) => {
     const user = await getUser(db, id);
-    if (!user)
+    if (!user || user.id == 1)
         return null;
     await db.run(`UPDATE matches SET player1_id = 1 WHERE player1_id = ?`, [id]);
     await db.run(`UPDATE matches SET player2_id = 1 WHERE player2_id = ?`, [id]);
     await db.run(`UPDATE matches SET winner_id = 1 WHERE winner_id = ?`, [id]);
     await db.run('DELETE FROM friends WHERE user_id = ? OR friend_id = ?', [id, id]);
-    await db.run('DELETE FROM stats WHERE id = ?', [id]);
+    await db.run('DELETE FROM stats WHERE user_id = ?', [id]);
     await db.run('DELETE FROM users WHERE id = ?', [id]);
     return user;
 };
@@ -77,7 +76,7 @@ export const signIn = async (db, email, password) => {
         const secret_2fa = Math.floor(100000 + Math.random() * 900000).toString();
         const hash = await bcrypt.hash(secret_2fa, saltRounds);
         await db.run(`UPDATE users SET secret_2fa = ?, timer_2fa = datetime('now', '+5 minutes') WHERE id = ?`, [hash, user.id]);
-        await sendEmail('psychoaoc@gmail.com', "Authentification code", `here is your code: ${secret_2fa}`);
+        await sendEmail(user.email, "Authentification code", `here is your code: ${secret_2fa}`);
         return { require2FA: true, userId: user.id };
     }
     const token = signToken({ userId: user.id });
@@ -97,4 +96,7 @@ export const req_2fa = async (db, id, secret_2fa) => {
     await db.run(`UPDATE users SET secret_2fa = NULL WHERE id = ?`, [id]);
     const token = signToken({ userId: user.id });
     return { token };
+};
+export const updateUserStatus = async (db, id, status) => {
+    await db.run(`UPDATE users SET isLogged = ? WHERE id = ?`, status, id);
 };
