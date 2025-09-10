@@ -1,4 +1,4 @@
-import { createUser, getUser, updateUser, deleteUser, signIn, req_2fa, getProfile, getPersonnalData, anonymiseUser } from '../controllers/usersController.js';
+import { createUser, getUser, updateUser, deleteUser, signIn, req_2fa, getProfile, getPersonnalData, anonymiseUser, getUsername } from '../controllers/usersController.js';
 import { userResponseSchema, ProfileResponseSchema } from '../schemas/schema.js';
 import { verifyToken } from '../jwt.js';
 const userRoutes = async (fastify, opts) => {
@@ -134,6 +134,47 @@ const userRoutes = async (fastify, opts) => {
             const { id } = request.params;
             try {
                 const user = await getProfile(db, id);
+                if (!user) {
+                    reply.code(404).send({ error: "User not found" });
+                    return;
+                }
+                reply.send(user);
+            }
+            catch (err) {
+                reply.code(500).send({ error: 'Failed to fetch user' });
+            }
+        }
+    });
+    fastify.route({
+        method: 'GET',
+        url: "/username/:username",
+        schema: {
+            params: {
+                type: 'object',
+                required: ['username'],
+                properties: {
+                    id: { type: 'integer' }
+                }
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        username: { type: 'string' },
+                    },
+                },
+                404: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' }
+                    }
+                }
+            }
+        },
+        handler: async (request, reply) => {
+            const { username } = request.params;
+            try {
+                const user = await getUsername(db, username);
                 if (!user) {
                     reply.code(404).send({ error: "User not found" });
                     return;

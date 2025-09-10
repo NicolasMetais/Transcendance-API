@@ -32,12 +32,16 @@ export const getPersonnalData = async (db, id) => {
 export const getUser = async (db, id) => {
     return await db.get('SELECT id, username FROM users WHERE id = ?', [id]);
 };
+export const getUsername = async (db, username) => {
+    return await db.get('SELECT id FROM users WHERE username = ?', [username]);
+};
 export const anonymiseUser = async (db, id) => {
     const { user } = await getUser(db, id);
     if (!user)
         return null;
     const username = `username${user.id}`;
     const email = `email${user.id}@anonyme.com`;
+    //DESTACTIVER LA 2FA SI ACTIVEE
     await db.run('UPDATE users SET username = ?, email = ?, avatar_url = placeholder.jpg WHERE id = ?', [username, email, id]);
     return { username, email };
 };
