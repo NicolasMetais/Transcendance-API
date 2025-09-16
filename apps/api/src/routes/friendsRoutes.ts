@@ -152,14 +152,14 @@ const friendsRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: any
 					type: 'object',
 					properties: {
 						message: { type: 'string' }
-					},
+					}
+				},
 				404: {
 					type: 'object',
 					properties: {
 						error: { type: 'string' }
 					}
-				}
-			},
+				},
 			},
 		},
 		handler: async(request: any, reply: any) => {
@@ -194,16 +194,12 @@ const friendsRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: any
 				200: {
 					type: 'object',
 					properties: {
-						message: { type: 'string' }
-					},
+						message: { type: 'string' } } },
 				404: {
 					type: 'object',
 					properties: {
-						error: { type: 'string' }
-					}
-				}
-			},
-			},
+						error: { type: 'string' } } }
+			}
 		},
 		handler: async(request: any, reply: any) => {
 			const { user_id, friend_id } = request.body;
@@ -235,18 +231,10 @@ const friendsRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: any
 			},
 			response: {
 				200: {
-					type: 'object',
-					properties: {
-						message: { type: 'string' }
-					},
+					type: 'object', properties: { message: { type: 'string' } } },
 				404: {
-					type: 'object',
-					properties: {
-						error: { type: 'string' }
-					}
-				}
-			},
-			},
+					type: 'object', properties: { error: { type: 'string' } } }
+			}
 		},
 		handler: async(request: any, reply: any) => {
 			const { user_id, friend_id } = request.body;
@@ -267,28 +255,24 @@ const friendsRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: any
 		method: 'DELETE',
 		url: "/unblockFriend",
 		schema: {
-		body: {
-			type: 'object',
-			required: ['user_id', 'friend_id'],
-			properties: {
-				user_id: { type: 'number' },
-				friend_id : { type: 'number'},
+			body: {
+				type: 'object',
+				required: ['user_id', 'friend_id'],
+				properties: {
+					user_id: { type: 'number' },
+					friend_id : { type: 'number'},
+				},
+				additionalProperties: false,
 			},
-			additionalProperties: false,
-		},
 		response: {
 			200: {
 				type: 'object',
 				properties: {
-					message: { type: 'string' }
-				},
+					message: { type: 'string' } } },
 			404: {
 				type: 'object',
 				properties: {
-					error: { type: 'string' }
-				}
-			}
-		},
+					error: { type: 'string' } } }
 		},
 	},
 	handler: async(request: any, reply: any) => {
@@ -322,15 +306,11 @@ const friendsRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: any
 			200: {
 				type: 'object',
 				properties: {
-					message: { type: 'string' }
-				},
+					message: { type: 'string' } } },
 			404: {
 				type: 'object',
 				properties: {
-					error: { type: 'string' }
-				}
-			}
-		},
+					error: { type: 'string' } } }
 		},
 	},
 	handler: async(request: any, reply: any) => {

@@ -1,5 +1,6 @@
 import Fastify from 'fastify'
 import cors from "@fastify/cors";
+import multipart from '@fastify/multipart';
 import bdd from './app.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -59,7 +60,6 @@ app.setErrorHandler((error: any, request: any, reply: any) => {
   return reply.status(500).send({ error : 'Internal Server Error'});
 });
 
-
 // Autorise http://localhost:5173 à appeler l'API en dev
 await app.register(cors, {
 	origin: ["http://localhost:5173"],
@@ -67,6 +67,12 @@ await app.register(cors, {
 });
 
 await app.register(fastifyWebsocket);
+await app.register(multipart, {
+  limits: {
+    fileSize: 1_000_000,
+    files: 1,
+  }
+});
 
 const db = await bdd();
 

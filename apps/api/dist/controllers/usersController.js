@@ -32,23 +32,25 @@ export const getPersonnalData = async (db, id) => {
 export const getUser = async (db, id) => {
     return await db.get('SELECT id, username FROM users WHERE id = ?', [id]);
 };
-export const getUsername = async (db, username) => {
-    return await db.get('SELECT id FROM users WHERE username = ?', [username]);
-};
 export const anonymiseUser = async (db, id) => {
-    const { user } = await getUser(db, id);
+    const user = await getUser(db, id);
     if (!user)
         return null;
     const username = `username${user.id}`;
     const email = `email${user.id}@anonyme.com`;
-    //DESTACTIVER LA 2FA SI ACTIVEE
-    await db.run('UPDATE users SET username = ?, email = ?, avatar_url = placeholder.jpg WHERE id = ?', [username, email, id]);
+    const avatar = 'placeholder.jpg';
+    await db.run('UPDATE users SET username = ?, email = ?, avatar_url = ? WHERE id = ?', [username, email, avatar, id]);
     return { username, email };
 };
 export const updateUser = async (db, id, updates) => {
     const obj = Object.keys(updates);
     if (obj.length == 0)
         return getUser(db, id);
+    if ('password_hash' in updates && updates.password_hash) {
+        const saltRounds = 10;
+        const hash = await bcrypt.hash(updates.password_hash, saltRounds);
+        updates.password_hash = hash;
+    }
     const Datas = obj.map(obj => `${obj} = ?`).join(', ');
     const values = obj.map(obj => updates[obj]);
     values.push(id);
@@ -103,4 +105,7 @@ export const req_2fa = async (db, id, secret_2fa) => {
 };
 export const updateUserStatus = async (db, id, status) => {
     await db.run(`UPDATE users SET isLogged = ? WHERE id = ?`, status, id);
+};
+export const upload = async (db, id, avatar) => {
+    await db.run("UPDATE users SET avatar = ? WHERE id = ?", [avatar, id]);
 };

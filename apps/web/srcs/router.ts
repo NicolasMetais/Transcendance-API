@@ -1,40 +1,96 @@
 import { createHomePage } from './home';
 import { createGamePage } from './game';
+import { createTournamentPage } from './tournament';
+import { createSignInPage } from './signIn';
+import { createSignUpPage } from './signUp';
+import { createDashboardPage } from './dashboard';
+import { createProfilePage } from './profile';
+import { createMatchesPage } from './matches';
+import { createStatsPage } from './stats';
 
-// Fonctions pour afficher les pages
 export function showHomePage(): void {
-  createHomePage();
+	createHomePage();
 }
 
 export function showGamePage(): void {
-  createGamePage();
+	createGamePage();
 }
 
-// Fonction pour gérer le routage
+export function showTournamentPage(): void {
+	createTournamentPage();
+}
+
+export function showSignInPage(): void {
+	createSignInPage();
+}
+
+export function showSignUpPage(): void {
+	createSignUpPage();
+}
+
+export function showDashboardPage(): void {
+	createDashboardPage();
+}
+
+export function showProfilePage(): void {
+	createProfilePage();
+}
+
+export function showMatchesPage(): void {
+	createMatchesPage();
+}
+
+export function showStatsPage(): void {
+	createStatsPage();
+}
+
 export function handleRoute(): void {
-  const path = window.location.pathname;
-  
-  switch (path) {
-    case '/':
-    case '':
-      showHomePage();
-      break;
-    case '/game':
-      showGamePage();
-      break;
-    default:
-      // Page 404 - rediriger vers l'accueil
-      window.history.pushState({}, '', '/');
-      showHomePage();
-      break;
-  }
+	const path = window.location.pathname;
+
+	try {
+		const w = window as unknown as { pageCleanup?: () => void };
+		w.pageCleanup?.();
+		w.pageCleanup = undefined;
+	} catch { }
+
+	switch (path) {
+		case '/':
+		case '':
+			showHomePage();
+			break;
+		case '/game':
+			showGamePage();
+			break;
+		case '/tournament':
+			showTournamentPage();
+			break;
+		case '/signIn':
+			showSignInPage();
+			break;
+		case '/signUp':
+			showSignUpPage();
+			break;
+		case '/dashboard':
+			showDashboardPage();
+			break;
+		case '/profile':
+			showProfilePage();
+			break;
+		case '/matches':
+			showMatchesPage();
+			break;
+		case '/stats':
+			showStatsPage();
+			break;
+		default:
+			window.history.pushState({}, '', '/');
+			showHomePage();
+			break;
+	}
 }
 
-// Initialiser le routage
+
 export function initRouter(): void {
-  // Gérer la navigation initiale
-  handleRoute();
-  
-  // Écouter les changements d'URL (boutons retour/avancer du navigateur)
-  window.addEventListener('popstate', handleRoute);
+	handleRoute();
+	window.addEventListener('popstate', handleRoute);
 } 

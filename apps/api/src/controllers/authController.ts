@@ -8,7 +8,7 @@ export const googleOAuth = async (db: Database, code: string) => {
 	const client_url = process.env.GOOGLE_REDIRECT_URL;
 	if (!client_id || !client_secret || !client_url) {
   		throw new Error('Missing Google OAuth env variables');
-}
+	}
 
 	const params = new URLSearchParams();
 	params.append('code', code);

@@ -1,8 +1,15 @@
 import { FastifyPluginAsync, FastifyInstance } from 'fastify';
 import { Database } from 'sqlite';
-import { createUser, getUser, updateUser, deleteUser, signIn, req_2fa, getProfile, getPersonnalData, anonymiseUser, getUsername } from '../controllers/usersController.js'
+import { createUser, getUser, updateUser, deleteUser, signIn, req_2fa, getProfile, getPersonnalData, anonymiseUser, upload } from '../controllers/usersController.js'
 import { userResponseSchema, ProfileResponseSchema } from '../schemas/schema.js';
 import { verifyToken } from '../jwt.js';
+import fs from "fs";
+import path from "path";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: FastifyInstance, opts: any) => {
 	const { db } = opts;
@@ -66,6 +73,49 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 				}
 			};
 		},
+	});
+	fastify.post("/avatar", async (req: any, reply: any) => {
+			try {
+				const token = req.cookies.jwt;
+				const payload = verifyToken(token);
+				if (!payload)
+				{
+					reply.code(401).send({ error: "Unauthorized"});
+					return ;
+				}
+				const userId = (payload as any).userId;
+				const file = await req.file();
+				if (!file)
+				{
+					reply.code(400).send({ error: "There is no file"});
+					return ;
+				}
+				const allowedExt = ["image/png", "image/jpeg", "image/jpg"]
+				if (!allowedExt.includes(file.mimetype)) 
+				{
+					reply.code(400).send({ error: "Invalid format"});
+					return;
+				}
+				const dir = path.join(__dirname, "uploads");
+				if (!fs.existsSync(dir)) {
+					fs.mkdirSync(dir);
+				}
+				const ext = path.extname(file.filename);
+				const fileName = `avatar_${userId}${ext}`;
+				const filePath = path.join(dir, fileName);
+
+				await fs.promises.writeFile(filePath, await file.toBuffer());
+
+				await upload(db, userId, `/uploads/${fileName}`);
+
+				reply.send({ message: "Avatar Uploaded"});
+			} catch (err: any) {
+				if (err.code === 'SQLITE_CONSTRAINT') {
+						reply.code(409).send({ error: 'constraint problems' });
+				} else {
+					throw err;
+				}
+			};
 	});
 	fastify.route({
 		method: 'POST',
@@ -165,47 +215,6 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 			}
 		}
 	});
-		fastify.route({
-		method: 'GET',
-		url: "/username/:username",
-		schema: {
-			params: {
-				type : 'object',
-				required: ['username'],
-				properties: {
-					id: {type: 'integer' }
-				}
-			},
-			response:  {
-				200: { 
-					type: 'object',
-					properties: {
-						username: { type: 'string'},
-					},
-				},
-				404: {
-					type: 'object',
-					properties: {
-						error: { type: 'string' }
-					}
-				}
-			}
-		},
-		handler: async(request: any, reply: any) => {
-		 const { username } = request.params as { username: string };
-			try {
-				const user = await getUsername(db, username);
-				if (!user)
-				{
-					reply.code(404).send({ error: "User not found"});
-					return ;
-				}
-				reply.send(user);
-			} catch (err) {
-				reply.code(500).send({ error: 'Failed to fetch user' }); 
-			}
-		}
-	});
 	fastify.route({
 		method: 'POST',
 		url: "/myprofile",
@@ -228,7 +237,6 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 			}
 		},
 		handler: async(request: any, reply: any) => {
-		 const { id } = request.body as { id: number };
 			try {
 				const token = request.cookie.jwt;
 				const payload = verifyToken(token);
@@ -296,13 +304,18 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 				isLogged: string,
 			}>;
 			try {
-				const user = await getUser(db, id);
+				const token = request.cookie.jwt;
+				const payload = verifyToken(token);
+				if (!payload) 
+					return reply.code(401).send({ error: "Unauthorized" });
+				const userId = (payload as any).userId;
+				const user = await getUser(db, userId);
 				if (!user)
 				{
 					reply.code(404).send({ error: "User not found"});
 					return ;
 				}
-				const updatedUser = await updateUser(db, id, updates);
+				const updatedUser = await updateUser(db, userId, updates);
 				reply.send(updatedUser);
 			} catch (err) {
 				reply.code(500).send({ error: 'Failed to update user' }); 
@@ -339,9 +352,13 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 			},
 		},
 		handler: async(request: any, reply: any) => {
-			const { id } = request.body  as {id: number};
 			try {
-				const data = await anonymiseUser(db, id);
+				const token = request.cookie.jwt;
+				const payload = verifyToken(token);
+				if (!payload) 
+					return reply.code(401).send({ error: "Unauthorized" });
+				const userId = (payload as any).userId;
+				const data = await anonymiseUser(db, userId);
 				if (!data)
 				{
 					reply.code(404).send({ error: "User not found"});
@@ -375,9 +392,13 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 			},
 		},
 		handler: async(request: any, reply: any) => {
-			const { id } = request.params as { id: number };
 			try {
-				const deletedUser = await deleteUser(db, id);
+				const token = request.cookie.jwt;
+				const payload = verifyToken(token);
+				if (!payload) 
+					return reply.code(401).send({ error: "Unauthorized" });
+				const userId = (payload as any).userId;
+				const deletedUser = await deleteUser(db, userId);
 				if (!deletedUser)
 				{
 					reply.code(404).send({ error: "User not found"});

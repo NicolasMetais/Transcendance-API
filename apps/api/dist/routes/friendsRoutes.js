@@ -143,12 +143,12 @@ const friendsRoutes = async (fastify, opts) => {
                     type: 'object',
                     properties: {
                         message: { type: 'string' }
-                    },
-                    404: {
-                        type: 'object',
-                        properties: {
-                            error: { type: 'string' }
-                        }
+                    }
+                },
+                404: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' }
                     }
                 },
             },
@@ -186,15 +186,15 @@ const friendsRoutes = async (fastify, opts) => {
                     type: 'object',
                     properties: {
                         message: { type: 'string' }
-                    },
-                    404: {
-                        type: 'object',
-                        properties: {
-                            error: { type: 'string' }
-                        }
                     }
                 },
-            },
+                404: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' }
+                    }
+                }
+            }
         },
         handler: async (request, reply) => {
             const { user_id, friend_id } = request.body;
@@ -226,18 +226,12 @@ const friendsRoutes = async (fastify, opts) => {
             },
             response: {
                 200: {
-                    type: 'object',
-                    properties: {
-                        message: { type: 'string' }
-                    },
-                    404: {
-                        type: 'object',
-                        properties: {
-                            error: { type: 'string' }
-                        }
-                    }
+                    type: 'object', properties: { message: { type: 'string' } }
                 },
-            },
+                404: {
+                    type: 'object', properties: { error: { type: 'string' } }
+                }
+            }
         },
         handler: async (request, reply) => {
             const { user_id, friend_id } = request.body;
@@ -272,14 +266,14 @@ const friendsRoutes = async (fastify, opts) => {
                     type: 'object',
                     properties: {
                         message: { type: 'string' }
-                    },
-                    404: {
-                        type: 'object',
-                        properties: {
-                            error: { type: 'string' }
-                        }
                     }
                 },
+                404: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' }
+                    }
+                }
             },
         },
         handler: async (request, reply) => {
@@ -315,14 +309,14 @@ const friendsRoutes = async (fastify, opts) => {
                     type: 'object',
                     properties: {
                         message: { type: 'string' }
-                    },
-                    404: {
-                        type: 'object',
-                        properties: {
-                            error: { type: 'string' }
-                        }
                     }
                 },
+                404: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' }
+                    }
+                }
             },
         },
         handler: async (request, reply) => {
