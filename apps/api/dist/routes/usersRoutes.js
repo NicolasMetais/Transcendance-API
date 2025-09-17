@@ -58,13 +58,7 @@ const userRoutes = async (fastify, opts) => {
     });
     fastify.post("/avatar", async (req, reply) => {
         try {
-            const token = req.cookies.jwt;
-            const payload = verifyToken(token);
-            if (!payload) {
-                reply.code(401).send({ error: "Unauthorized" });
-                return;
-            }
-            const userId = payload.userId;
+            const userId = req.user.userId;
             const file = await req.file();
             if (!file) {
                 reply.code(400).send({ error: "There is no file" });
@@ -79,6 +73,8 @@ const userRoutes = async (fastify, opts) => {
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
             }
+            console.log("Dir:", dir);
+            console.log("File name:", file.filename);
             const ext = path.extname(file.filename);
             const fileName = `avatar_${userId}${ext}`;
             const filePath = path.join(dir, fileName);
@@ -195,13 +191,6 @@ const userRoutes = async (fastify, opts) => {
         method: 'POST',
         url: "/myprofile",
         schema: {
-            body: {
-                type: 'object',
-                required: ['id'],
-                properties: {
-                    id: { type: 'integer' }
-                }
-            },
             response: {
                 200: ProfileResponseSchema,
                 404: {
@@ -214,18 +203,14 @@ const userRoutes = async (fastify, opts) => {
         },
         handler: async (request, reply) => {
             try {
-                const token = request.cookie.jwt;
-                const payload = verifyToken(token);
-                if (!payload) {
-                    reply.code(401).send({ error: "Unauthorized" });
-                    return;
-                }
-                const userId = payload.userId;
+                const userId = request.user.userId;
+                console.log(`USERID : ${userId}`);
                 const data = await getPersonnalData(db, userId);
                 if (!data.user) {
                     reply.code(404).send({ error: "User not found" });
                     return;
                 }
+                console.log(data);
                 reply.send(data);
             }
             catch (err) {
@@ -271,7 +256,7 @@ const userRoutes = async (fastify, opts) => {
             const { id } = request.params;
             const updates = request.body;
             try {
-                const token = request.cookie.jwt;
+                const token = request.cookies.jwt;
                 const payload = verifyToken(token);
                 if (!payload)
                     return reply.code(401).send({ error: "Unauthorized" });
@@ -320,7 +305,7 @@ const userRoutes = async (fastify, opts) => {
         },
         handler: async (request, reply) => {
             try {
-                const token = request.cookie.jwt;
+                const token = request.cookies.jwt;
                 const payload = verifyToken(token);
                 if (!payload)
                     return reply.code(401).send({ error: "Unauthorized" });
@@ -360,7 +345,7 @@ const userRoutes = async (fastify, opts) => {
         },
         handler: async (request, reply) => {
             try {
-                const token = request.cookie.jwt;
+                const token = request.cookies.jwt;
                 const payload = verifyToken(token);
                 if (!payload)
                     return reply.code(401).send({ error: "Unauthorized" });

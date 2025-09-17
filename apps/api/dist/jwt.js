@@ -39,6 +39,8 @@ export function signToken(payload) {
     return jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
 }
 export function verifyToken(token) {
+    if (!token)
+        return null;
     try {
         return jwt.verify(token, JWT_SECRET);
     }

@@ -1,6 +1,7 @@
 import Fastify from 'fastify'
 import cors from "@fastify/cors";
 import multipart from '@fastify/multipart';
+import fastifyCookie from '@fastify/cookie';
 import bdd from './app.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -74,6 +75,7 @@ await app.register(multipart, {
   }
 });
 
+await app.register(fastifyCookie);
 const db = await bdd();
 
 //routes non protegee par un JWT

@@ -82,11 +82,11 @@ export const ProfileResponseSchema = {
       type: 'object',
       properties: {
         user_id: { type: 'integer' },
-        games_played: { type: 'integer' },
+        game_played: { type: 'integer' },
         games_won: { type: 'integer' },
         total_score: { type: 'integer' },
       },
-      required: ['user_id', 'games_played', 'games_won', 'total_score'],
+      required: ['user_id', 'game_played', 'games_won', 'total_score'],
     },
   },
   required: ['user', 'friends', 'matches', 'stats'],

@@ -44,7 +44,8 @@ export function signToken(payload: object): string {
   return jwt.sign(payload, JWT_SECRET as string, { expiresIn: '24h'});
 }
 
-export function verifyToken(token: string): JwtPayload | string | null {
+export function verifyToken(token?: string): JwtPayload | string | null {
+	if (!token) return null;
 	try {
     	return jwt.verify(token, JWT_SECRET as string);
 	} catch (err: any) {

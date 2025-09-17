@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import cors from "@fastify/cors";
 import multipart from '@fastify/multipart';
+import fastifyCookie from '@fastify/cookie';
 import bdd from './app.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -61,6 +62,7 @@ async function start() {
             files: 1,
         }
     });
+    await app.register(fastifyCookie);
     const db = await bdd();
     //routes non protegee par un JWT
     const openPaths = ['/signUp', '/signIn', '/auth/google/callback', '/2fa_req', '/connexionStatus', '/showUsers', '/showStats', '/showFriends', '/showMatches'];

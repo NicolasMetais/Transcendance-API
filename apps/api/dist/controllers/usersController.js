@@ -24,7 +24,7 @@ export const getProfile = async (db, id) => {
 };
 export const getPersonnalData = async (db, id) => {
     const user = await db.get('SELECT * FROM users WHERE id = ?', [id]);
-    const friends = await db.all('SELECT * FROM friends WHERE user_id = ? OR friends_id = ?', [id, id]);
+    const friends = await db.all('SELECT * FROM friends WHERE user_id = ? OR friend_id = ?', [id, id]);
     const matches = await db.all('SELECT * FROM matches WHERE player1_id = ? OR player2_id = ?', [id, id]);
     const stats = await db.get('SELECT * FROM stats WHERE user_id = ? ', [id]);
     return { user, friends, matches, stats };
@@ -107,5 +107,5 @@ export const updateUserStatus = async (db, id, status) => {
     await db.run(`UPDATE users SET isLogged = ? WHERE id = ?`, status, id);
 };
 export const upload = async (db, id, avatar) => {
-    await db.run("UPDATE users SET avatar = ? WHERE id = ?", [avatar, id]);
+    await db.run("UPDATE users SET avatar_url = ? WHERE id = ?", [avatar, id]);
 };
