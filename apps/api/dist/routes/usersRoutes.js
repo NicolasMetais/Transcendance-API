@@ -1,4 +1,4 @@
-import { createUser, getUser, updateUser, deleteUser, signIn, req_2fa, getProfile, getPersonnalData, anonymiseUser, upload } from '../controllers/usersController.js';
+import { createUser, getUser, updateUser, deleteUser, signIn, req_2fa, getProfile, getPersonnalData, anonymiseUser, upload, getAvatar } from '../controllers/usersController.js';
 import { userResponseSchema, ProfileResponseSchema } from '../schemas/schema.js';
 import { verifyToken } from '../jwt.js';
 import fs from "fs";
@@ -181,6 +181,40 @@ const userRoutes = async (fastify, opts) => {
                     return;
                 }
                 reply.send(user);
+            }
+            catch (err) {
+                reply.code(500).send({ error: 'Failed to fetch user' });
+            }
+        }
+    });
+    fastify.route({
+        method: 'GET',
+        url: "/avatar",
+        schema: {
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        avatar_url: { type: 'string' }
+                    }
+                },
+                404: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' }
+                    }
+                }
+            }
+        },
+        handler: async (request, reply) => {
+            const userId = request.user.userId;
+            try {
+                const avatar = await getAvatar(db, userId);
+                if (!avatar) {
+                    reply.code(404).send({ error: "avatar not found" });
+                    return;
+                }
+                reply.send(avatar);
             }
             catch (err) {
                 reply.code(500).send({ error: 'Failed to fetch user' });

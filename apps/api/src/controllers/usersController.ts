@@ -40,6 +40,10 @@ export const getUser = async (db: Database, id: number) => {
 	return await db.get('SELECT id, username FROM users WHERE id = ?', [id]);
 };
 
+export const getAvatar = async (db: Database, id: number) => {
+	return await db.get('SELECT id, avatar_url FROM users WHERE id = ?', [id]);
+};
+
 export const anonymiseUser = async (db: Database, id: number) => {
 	const user = await getUser(db, id);
 	if (!user)
