@@ -73,13 +73,11 @@ const userRoutes = async (fastify, opts) => {
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
             }
-            console.log("Dir:", dir);
-            console.log("File name:", file.filename);
             const ext = path.extname(file.filename);
             const fileName = `avatar_${userId}${ext}`;
             const filePath = path.join(dir, fileName);
             await fs.promises.writeFile(filePath, await file.toBuffer());
-            await upload(db, userId, `/uploads/${fileName}`);
+            await upload(db, userId, fileName);
             reply.send({ message: "Avatar Uploaded" });
         }
         catch (err) {
@@ -193,10 +191,8 @@ const userRoutes = async (fastify, opts) => {
         schema: {
             response: {
                 200: {
-                    type: 'object',
-                    properties: {
-                        avatar_url: { type: 'string' }
-                    }
+                    type: 'string',
+                    format: 'binary'
                 },
                 404: {
                     type: 'object',
@@ -209,12 +205,24 @@ const userRoutes = async (fastify, opts) => {
         handler: async (request, reply) => {
             const userId = request.user.userId;
             try {
+                console.log("TEST\n");
                 const avatar = await getAvatar(db, userId);
+                console.log("TEST\n");
                 if (!avatar) {
                     reply.code(404).send({ error: "avatar not found" });
                     return;
                 }
-                reply.send(avatar);
+                const filePath = path.join(__dirname, 'uploads', avatar.avatar_url);
+                if (!fs.existsSync(filePath)) {
+                    return reply.code(404).send({ error: "File not found on disk" });
+                }
+                console.log("Sending file:", filePath);
+                fs.access(filePath, fs.constants.R_OK, (err) => {
+                    console.log(err ? 'Cannot read file' : 'File is readable');
+                });
+                const data = await fs.promises.readFile(filePath);
+                console.log('File size:', data.length);
+                reply.sendFile(avatar.avatar_url);
             }
             catch (err) {
                 reply.code(500).send({ error: 'Failed to fetch user' });

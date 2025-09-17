@@ -68,6 +68,14 @@ await app.register(cors, {
 });
 
 await app.register(fastifyWebsocket);
+
+console.log(__dirname);
+
+await app.register(fastifyStatic, {
+  root: path.join(__dirname, 'routes/uploads'),
+  prefix: '/uploads/',
+});
+
 await app.register(multipart, {
   limits: {
     fileSize: 1_000_000,
@@ -85,6 +93,11 @@ app.addHook('preHandler', (request: any, reply: any, done: any) => {
   if (openPaths.includes(request.routerPath)) {
     done();
     return ;
+  }
+  if (request.raw.url?.startsWith('/uploads/'))
+  {
+      done();
+      return ;
   }
   const url = request.raw.url.split('?')[0];
   if (openPaths.includes(url)) {

@@ -93,15 +93,13 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 				if (!fs.existsSync(dir)) {
 					fs.mkdirSync(dir);
 				}
-				console.log("Dir:", dir);
-				console.log("File name:", file.filename)
 				const ext = path.extname(file.filename);
 				const fileName = `avatar_${userId}${ext}`;
 				const filePath = path.join(dir, fileName);
 
 				await fs.promises.writeFile(filePath, await file.toBuffer());
 
-				await upload(db, userId, `/uploads/${fileName}`);
+				await upload(db, userId, fileName);
 
 				reply.send({ message: "Avatar Uploaded"});
 			} catch (err: any) {
@@ -205,40 +203,6 @@ const userRoutes: FastifyPluginAsync <{ db: Database }> = async (fastify: Fastif
 					return ;
 				}
 				reply.send(user);
-			} catch (err) {
-				reply.code(500).send({ error: 'Failed to fetch user' }); 
-			}
-		}
-	});
-	fastify.route({
-		method: 'GET',
-		url: "/avatar",
-		schema: {
-			response:  {
-				200: {
-					type: 'object',
-					properties: {
-						avatar_url: { type: 'string'}
-					}
-				},
-				404: {
-					type: 'object',
-					properties: {
-						error: { type: 'string' }
-					}
-				}
-			}
-		},
-		handler: async(request: any, reply: any) => {
-			const userId = (request as any).user.userId;
-			try {
-				const avatar = await getAvatar(db, userId);
-				if (!avatar)
-				{
-					reply.code(404).send({ error: "avatar not found"});
-					return ;
-				}
-				reply.send(avatar);
 			} catch (err) {
 				reply.code(500).send({ error: 'Failed to fetch user' }); 
 			}
