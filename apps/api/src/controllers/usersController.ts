@@ -116,7 +116,7 @@ export const signIn = async (db: Database, email: string, password: string) => {
 
 export const req_2fa = async (db: Database, id: number, secret_2fa: string) => {
 
-	const user = await db.get("SELECT * FROM users WHERE user = ?", [id]);
+	const user = await db.get("SELECT * FROM users WHERE id = ?", [id]);
 	if (!user)
 		return { error: 'user' };
 	const now = new Date();
