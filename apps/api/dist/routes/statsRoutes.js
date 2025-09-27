@@ -44,3 +44,4 @@ const statsRoute = async (fastify, opts) => {
         }
     });
 };
+export default statsRoute;

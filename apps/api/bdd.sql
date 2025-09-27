@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS stats (
 	game_played INTEGER DEFAULT 0,
 	games_won INTEGER DEFAULT 0,
 	total_score INTEGER DEFAULT 0,
+	
 	FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

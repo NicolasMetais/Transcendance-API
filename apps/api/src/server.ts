@@ -10,6 +10,8 @@ import defaultRoute from "./routes/testRoutes.js"
 import userRoutes from "./routes/usersRoutes.js";
 import matchesRoutes from "./routes/matchesRoutes.js";
 import friendsRoutes from "./routes/friendsRoutes.js";
+import statsRoute from "./routes/statsRoutes.js";
+
 import authRoutes from "./routes/authRoutes.js";
 import websocketsRoutes from './routes/websocketsRoutes.js';
 
@@ -68,8 +70,6 @@ await app.register(cors, {
 });
 
 await app.register(fastifyWebsocket);
-
-console.log(__dirname);
 
 await app.register(fastifyStatic, {
   root: path.join(__dirname, 'routes/uploads'),
@@ -134,6 +134,8 @@ app.register(matchesRoutes, { db });
 app.register(friendsRoutes, { db });
 app.register(authRoutes, { db });
 app.register(websocketsRoutes, { db });
+app.register(statsRoute, { db });
+
 
 
 

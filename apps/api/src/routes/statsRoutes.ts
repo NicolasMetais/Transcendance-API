@@ -47,3 +47,4 @@ fastify.route({
 		}
 	});
 }
+export default statsRoute;
